@@ -31,8 +31,8 @@
     <dependencies>
         <dependency>
             <groupId>com.sparrow</groupId>
-            <artifactId>sparrow-context</artifactId>
-            <version>${sparrow_context_version}</version>
+            <artifactId>sparrow</artifactId>
+            <version>${sparrow_version}</version>
         </dependency>
         <dependency>
             <groupId>javax.transaction</groupId>

@@ -39,7 +39,7 @@ public class ProxyConnection implements Connection {
             this.conn = DriverManager.getConnection(datasourceConfig.getUrl(), datasourceConfig.getUsername(), datasourceConfig.getPassword());
             this.connectionPool = connectionPool;
         } catch (Exception e) {
-            logger.error("for name driver class name error", e);
+            logger.error("for driver class name error", e);
         }
     }
 

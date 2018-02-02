@@ -18,7 +18,6 @@
 package com.sparrow.datasource;
 
 import com.sparrow.constant.SPARROW_ERROR;
-import com.sparrow.support.ConnectionContextHolder;
 import com.sparrow.transaction.Transaction;
 import com.sparrow.exception.BusinessException;
 import org.slf4j.Logger;
