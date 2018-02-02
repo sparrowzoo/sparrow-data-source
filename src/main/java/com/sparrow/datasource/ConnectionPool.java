@@ -18,7 +18,8 @@
 package com.sparrow.datasource;
 
 import com.sparrow.concurrent.SparrowThreadFactory;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
+import com.sparrow.container.Container;
+import com.sparrow.container.ContainerAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,8 +32,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -41,8 +42,10 @@ import java.util.concurrent.TimeUnit;
  * @author harry
  * @version 1.0
  */
-public class ConnectionPool implements DataSource {
+public class ConnectionPool implements DataSource,ContainerAware{
     private static Logger logger = LoggerFactory.getLogger(ConnectionPool.class);
+
+    private DataSourceFactory dataSourceFactory;
     
     private int openedConnectionCount = 0;
     private int closedConnectionCount = 0;
@@ -60,11 +63,11 @@ public class ConnectionPool implements DataSource {
 
     private DatasourceConfig connectionConfig;
 
-    /**
-     * 单子构造
-     */
+    public void setDataSourceFactory(DataSourceFactory dataSourceFactory) {
+        this.dataSourceFactory = dataSourceFactory;
+    }
+
     public ConnectionPool() {
-        init();
     }
 
     /**
@@ -74,14 +77,14 @@ public class ConnectionPool implements DataSource {
      */
     public ConnectionPool(String dataSourceKey) {
         this.dataSourceKey = dataSourceKey;
-        this.init();
     }
 
     /**
      * 初始化数据库链接池
      */
-    private void init() {
-        this.connectionConfig = DataSourceFactory.getInstance().getDatasourceConfig(this.dataSourceKey);
+    @Override
+    public void aware(Container container, String beanName) {
+        this.connectionConfig = this.dataSourceFactory.getDatasourceConfig(this.dataSourceKey);
         pool = new Vector<Connection>(this.connectionConfig.getPoolSize());
         this.usedPool = new ConcurrentHashMap<Connection, Long>(this.connectionConfig.getPoolSize());
         for (int i = 0; i < this.connectionConfig.getPoolSize(); i++) {
@@ -239,4 +242,5 @@ public class ConnectionPool implements DataSource {
         throws SQLFeatureNotSupportedException {
         return null;
     }
+
 }

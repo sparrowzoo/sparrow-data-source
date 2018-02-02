@@ -18,7 +18,7 @@
 package com.sparrow.datasource;
 
 import com.sparrow.constant.SPARROW_ERROR;
-import com.sparrow.support.ContextHolder;
+import com.sparrow.support.ConnectionContextHolder;
 import com.sparrow.transaction.Transaction;
 import com.sparrow.exception.BusinessException;
 import org.slf4j.Logger;
@@ -35,13 +35,18 @@ import java.sql.SQLException;
  */
 public class SparrowTransactionManager implements com.sparrow.transaction.TransactionManager {
     private static Logger logger = LoggerFactory.getLogger(SparrowTransactionManager.class);
-    private static SparrowTransactionManager transactionManager = new SparrowTransactionManager();
 
-    public static SparrowTransactionManager getInstance() {
-        return transactionManager;
+    private ConnectionContextHolder connectionHolder;
+
+    private DataSourceFactory dataSourceFactory;
+
+    public void setConnectionHolder(ConnectionContextHolder connectionHolder) {
+        this.connectionHolder = connectionHolder;
     }
 
-    private ContextHolder connectionHolder = ContextHolder.getInstance();
+    public void setDataSourceFactory(DataSourceFactory dataSourceFactory) {
+        this.dataSourceFactory = dataSourceFactory;
+    }
 
     @Override
     public <T> T start(Transaction<T> transaction) throws BusinessException {
@@ -52,7 +57,7 @@ public class SparrowTransactionManager implements com.sparrow.transaction.Transa
     public <T> T start(Transaction<T> transaction, String dataSourceKey) throws BusinessException {
         Connection connection = null;
         try {
-            DataSource dataSource = DataSourceFactory.getInstance().getDataSource(dataSourceKey);
+            DataSource dataSource = this.dataSourceFactory.getDataSource(dataSourceKey);
             connection = dataSource.getConnection();
             connection.setAutoCommit(false);
             connection.setReadOnly(false);
