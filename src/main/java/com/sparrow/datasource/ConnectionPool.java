@@ -45,7 +45,7 @@ import java.util.concurrent.TimeUnit;
 public class ConnectionPool implements DataSource,ContainerAware{
     private static Logger logger = LoggerFactory.getLogger(ConnectionPool.class);
 
-    private DataSourceFactory dataSourceFactory;
+    private DataSourceFactoryImpl dataSourceFactory;
     
     private int openedConnectionCount = 0;
     private int closedConnectionCount = 0;
@@ -63,7 +63,7 @@ public class ConnectionPool implements DataSource,ContainerAware{
 
     private DatasourceConfig connectionConfig;
 
-    public void setDataSourceFactory(DataSourceFactory dataSourceFactory) {
+    public void setDataSourceFactory(DataSourceFactoryImpl dataSourceFactory) {
         this.dataSourceFactory = dataSourceFactory;
     }
 

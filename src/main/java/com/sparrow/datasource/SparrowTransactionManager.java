@@ -35,15 +35,15 @@ import java.sql.SQLException;
 public class SparrowTransactionManager implements com.sparrow.transaction.TransactionManager {
     private static Logger logger = LoggerFactory.getLogger(SparrowTransactionManager.class);
 
-    private ConnectionContextHolder connectionHolder;
+    private ConnectionContextHolderImpl connectionHolder;
 
-    private DataSourceFactory dataSourceFactory;
+    private DataSourceFactoryImpl dataSourceFactory;
 
-    public void setConnectionHolder(ConnectionContextHolder connectionHolder) {
+    public void setConnectionHolder(ConnectionContextHolderImpl connectionHolder) {
         this.connectionHolder = connectionHolder;
     }
 
-    public void setDataSourceFactory(DataSourceFactory dataSourceFactory) {
+    public void setDataSourceFactory(DataSourceFactoryImpl dataSourceFactory) {
         this.dataSourceFactory = dataSourceFactory;
     }
 
