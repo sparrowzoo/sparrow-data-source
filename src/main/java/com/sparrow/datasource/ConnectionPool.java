@@ -59,8 +59,6 @@ public class ConnectionPool implements DataSource,ContainerAware{
 
     public Map<Connection, Long> usedPool;
 
-    private String dataSourceKey;
-
     private DatasourceConfig connectionConfig;
 
     public void setDataSourceFactory(DataSourceFactoryImpl dataSourceFactory) {
@@ -71,20 +69,11 @@ public class ConnectionPool implements DataSource,ContainerAware{
     }
 
     /**
-     * 唯一确定一个数据源
-     *
-     * @param dataSourceKey 数据源
-     */
-    public ConnectionPool(String dataSourceKey) {
-        this.dataSourceKey = dataSourceKey;
-    }
-
-    /**
      * 初始化数据库链接池
      */
     @Override
     public void aware(Container container, String beanName) {
-        this.connectionConfig = this.dataSourceFactory.getDatasourceConfig(this.dataSourceKey);
+        this.connectionConfig = this.dataSourceFactory.getDatasourceConfig(beanName);
         pool = new Vector<Connection>(this.connectionConfig.getPoolSize());
         this.usedPool = new ConcurrentHashMap<Connection, Long>(this.connectionConfig.getPoolSize());
         for (int i = 0; i < this.connectionConfig.getPoolSize(); i++) {
