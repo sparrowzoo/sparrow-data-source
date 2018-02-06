@@ -23,8 +23,13 @@ import com.sparrow.core.spi.ApplicationContext;
 import com.sparrow.support.EnvironmentSupport;
 import com.sparrow.utility.CollectionsUtility;
 import com.sparrow.utility.StringUtility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
@@ -37,19 +42,20 @@ import javax.sql.DataSource;
  */
 public class DataSourceFactoryImpl implements DataSourceFactory {
 
+    private static Logger logger = LoggerFactory.getLogger(DataSourceFactoryImpl.class);
     private static Map<String, DatasourceConfig> datasourceConfigMap = new ConcurrentHashMap<String, DatasourceConfig>();
 
     public DataSourceFactoryImpl(String initDatasourceKeys) {
-        String[] datasourceKeyArray=initDatasourceKeys.split(",");
-        if(CollectionsUtility.isNullOrEmpty(datasourceKeyArray)){
+        String[] datasourceKeyArray = initDatasourceKeys.split(",");
+        if (CollectionsUtility.isNullOrEmpty(datasourceKeyArray)) {
             return;
         }
-        for(String datasource:datasourceKeyArray){
+        for (String datasource : datasourceKeyArray) {
             this.getDatasourceConfig(datasource);
         }
     }
 
-    public DataSourceFactoryImpl(){
+    public DataSourceFactoryImpl() {
         this("sparrow_default");
     }
 
@@ -58,18 +64,21 @@ public class DataSourceFactoryImpl implements DataSourceFactory {
      *
      * @return
      */
-    @Override public DataSource getDataSource(String dataSourceKey) {
+    @Override
+    public DataSource getDataSource(String dataSourceKey) {
         if (StringUtility.isNullOrEmpty(dataSourceKey)) {
             dataSourceKey = DatasourceKey.getDefault().getKey();
         }
         return ApplicationContext.getContainer().getBean(dataSourceKey);
     }
 
-    @Override public DataSource getDataSource() {
+    @Override
+    public DataSource getDataSource() {
         return getDataSource(null);
     }
 
-    @Override public DatasourceConfig getDatasourceConfig() {
+    @Override
+    public DatasourceConfig getDatasourceConfig() {
         return getDatasourceConfig(null);
     }
 
@@ -80,7 +89,8 @@ public class DataSourceFactoryImpl implements DataSourceFactory {
      * @param dataSourceKey
      * @return
      */
-    @Override public DatasourceConfig getDatasourceConfig(String dataSourceKey) {
+    @Override
+    public DatasourceConfig getDatasourceConfig(String dataSourceKey) {
         if (StringUtility.isNullOrEmpty(dataSourceKey)) {
             dataSourceKey = "sparrow_default";
         }
@@ -97,7 +107,7 @@ public class DataSourceFactoryImpl implements DataSourceFactory {
                 Properties props = new Properties();
 
                 String filePath = "/" + dataSourceKey
-                    + ".properties";
+                        + ".properties";
                 props.load(EnvironmentSupport.getInstance().getFileInputStream(filePath));
 
                 datasourceConfig.setDriverClassName(props.getProperty("driverClassName"));
@@ -109,13 +119,34 @@ public class DataSourceFactoryImpl implements DataSourceFactory {
                 throw new RuntimeException(ignore);
             }
             DatasourceKey key = DatasourceKey.parse(dataSourceKey);
-            Cache.getInstance().put(CACHE_KEY.DATA_SOURCE_URL_PAIR, datasourceConfig.getUrl(), key);
+            //detection jdbc config useful
+            Connection connection = new ProxyConnection(datasourceConfig, null);
+            Statement statement = null;
+            try {
+                statement = connection.createStatement();
+                boolean effectCount = statement.execute("SELECT 1");
+                if (effectCount) {
+                    Cache.getInstance().put(CACHE_KEY.DATA_SOURCE_URL_PAIR, connection.getMetaData().getURL(), key);
+                }
+            } catch (SQLException e) {
+                logger.error(" cat't connection", e);
+            } finally {
+                try {
+                    if (statement != null) {
+                        statement.close();
+                    }
+                    connection.close();
+                } catch (SQLException e) {
+                    logger.error("test connection close error", e);
+                }
+            }
             datasourceConfigMap.put(dataSourceKey, datasourceConfig);
             return datasourceConfig;
         }
     }
 
-    @Override public DatasourceKey getDatasourceKey(Connection connection) {
+    @Override
+    public DatasourceKey getDatasourceKey(Connection connection) {
         if (connection == null) {
             return null;
         }
