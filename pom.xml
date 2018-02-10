@@ -34,10 +34,6 @@
             <artifactId>sparrow</artifactId>
             <version>${sparrow_version}</version>
         </dependency>
-        <dependency>
-            <groupId>javax.transaction</groupId>
-            <artifactId>jta</artifactId>
-        </dependency>
     </dependencies>
     <build>
         <finalName>${project.artifactId}</finalName>
