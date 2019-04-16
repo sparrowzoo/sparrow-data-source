@@ -48,12 +48,12 @@ public class SparrowTransactionManager implements com.sparrow.transaction.Transa
     }
 
     @Override
-    public <T> T start(Transaction<T> transaction) throws BusinessException {
+    public <T> T start(Transaction<T> transaction){
         return this.start(transaction, null);
     }
 
     @Override
-    public <T> T start(Transaction<T> transaction, String dataSourceKey) throws BusinessException {
+    public <T> T start(Transaction<T> transaction, String dataSourceKey) {
         Connection connection = null;
         try {
             DataSource dataSource = this.dataSourceFactory.getDataSource(dataSourceKey);
@@ -72,8 +72,8 @@ public class SparrowTransactionManager implements com.sparrow.transaction.Transa
                 } catch (SQLException ignore) {
                 }
             }
-            logger.error("db transection error", e);
-            throw new BusinessException(SPARROW_ERROR.SYSTEM_SERVER_ERROR);
+            logger.error("db transaction error", e);
+            throw new RuntimeException("db transaction error",e);
         } finally {
             this.connectionHolder.unbindConnection(connection);
         }
