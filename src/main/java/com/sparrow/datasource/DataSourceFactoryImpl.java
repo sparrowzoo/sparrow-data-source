@@ -18,7 +18,7 @@
 package com.sparrow.datasource;
 
 import com.sparrow.constant.CACHE_KEY;
-import com.sparrow.core.Cache;
+import com.sparrow.core.cache.Cache;
 import com.sparrow.core.spi.ApplicationContext;
 import com.sparrow.support.EnvironmentSupport;
 import com.sparrow.utility.CollectionsUtility;
@@ -27,7 +27,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Map;
