@@ -18,7 +18,7 @@
 package com.sparrow.datasource;
 
 import com.sparrow.constant.CACHE_KEY;
-import com.sparrow.core.cache.Cache;
+import com.sparrow.core.cache.CacheBack;
 import com.sparrow.core.spi.ApplicationContext;
 import com.sparrow.support.EnvironmentSupport;
 import com.sparrow.utility.CollectionsUtility;
@@ -125,7 +125,7 @@ public class DataSourceFactoryImpl implements DataSourceFactory {
                 statement = connection.createStatement();
                 boolean effectCount = statement.execute("SELECT 1");
                 if (effectCount) {
-                    Cache.getInstance().put(CACHE_KEY.DATA_SOURCE_URL_PAIR, connection.getMetaData().getURL(), key);
+                    CacheBack.getInstance().put(CACHE_KEY.DATA_SOURCE_URL_PAIR, connection.getMetaData().getURL(), key);
                 }
             } catch (SQLException e) {
                 logger.error(" cat't connection", e);
@@ -150,7 +150,7 @@ public class DataSourceFactoryImpl implements DataSourceFactory {
             return null;
         }
         try {
-            return Cache.getInstance().get(CACHE_KEY.DATA_SOURCE_URL_PAIR, connection.getMetaData().getURL());
+            return CacheBack.getInstance().get(CACHE_KEY.DATA_SOURCE_URL_PAIR, connection.getMetaData().getURL());
         } catch (SQLException e) {
             return null;
         }
