@@ -19,6 +19,7 @@ package com.sparrow.datasource;
 
 import com.sparrow.constant.CACHE_KEY;
 import com.sparrow.core.cache.Cache;
+import com.sparrow.core.cache.StrongDurationCache;
 import com.sparrow.core.spi.ApplicationContext;
 import com.sparrow.support.EnvironmentSupport;
 import com.sparrow.utility.CollectionsUtility;
@@ -43,6 +44,7 @@ public class DataSourceFactoryImpl implements DataSourceFactory {
 
     private static Logger logger = LoggerFactory.getLogger(DataSourceFactoryImpl.class);
     private static Map<String, DatasourceConfig> datasourceConfigMap = new ConcurrentHashMap<String, DatasourceConfig>();
+    private static Cache<String,DatasourceKey> datasourceUrlPair=new StrongDurationCache<>(CACHE_KEY.DATA_SOURCE_URL_PAIR);
 
     public DataSourceFactoryImpl(String initDatasourceKeys) {
         String[] datasourceKeyArray = initDatasourceKeys.split(",");
@@ -125,7 +127,7 @@ public class DataSourceFactoryImpl implements DataSourceFactory {
                 statement = connection.createStatement();
                 boolean effectCount = statement.execute("SELECT 1");
                 if (effectCount) {
-                    Cache.getInstance().put(CACHE_KEY.DATA_SOURCE_URL_PAIR, connection.getMetaData().getURL(), key);
+                    datasourceUrlPair.put(connection.getMetaData().getURL(), key);
                 }
             } catch (SQLException e) {
                 logger.error(" cat't connection", e);
@@ -150,7 +152,7 @@ public class DataSourceFactoryImpl implements DataSourceFactory {
             return null;
         }
         try {
-            return Cache.getInstance().get(CACHE_KEY.DATA_SOURCE_URL_PAIR, connection.getMetaData().getURL());
+            return datasourceUrlPair.get(connection.getMetaData().getURL());
         } catch (SQLException e) {
             return null;
         }
