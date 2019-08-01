@@ -60,6 +60,7 @@ public class ProxyConnection implements Connection {
 
     @Override
     public synchronized void close() {
+        System.err.println("proxy connection close");
         if (this.connectionPool == null) {
             try {
                 this.conn.close();

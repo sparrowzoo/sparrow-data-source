@@ -51,7 +51,10 @@ public class ConnectionPool implements DataSource,ContainerAware{
     private int closedConnectionCount = 0;
 
     private PrintWriter logWriter;
-    private int loginTimeout = 0;
+    /**
+     * 登录超时时间，默认为5分钟
+     */
+    private int loginTimeout = 5;
     /**
      * 数据池数组对象 <p> connectionPool加最后一次使用时间
      */
@@ -89,8 +92,12 @@ public class ConnectionPool implements DataSource,ContainerAware{
                 Map<Connection, Long> usedPool = ConnectionPool.this.usedPool;
                 List<Connection> pool = ConnectionPool.this.pool;
                 for (Connection c : usedPool.keySet()) {
+                    if(ConnectionPool.this.loginTimeout==0){
+                        return;
+                    }
                     if ((System.currentTimeMillis() - usedPool.get(c)) / 1000 / 60d > ConnectionPool.this
                         .getLoginTimeout()) {
+                        //expire connection
                         usedPool.remove(c);
                         pool.add(c);
                     }
@@ -227,9 +234,7 @@ public class ConnectionPool implements DataSource,ContainerAware{
     }
 
     //jdk1.6 without this api
-    public java.util.logging.Logger getParentLogger()
-        throws SQLFeatureNotSupportedException {
+    public java.util.logging.Logger getParentLogger(){
         return null;
     }
-
 }
