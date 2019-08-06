@@ -33,7 +33,7 @@ public class ConnectionValidCheckerAdapter implements DataSourceValidChecker {
         } finally {
             JDBCUtils.close(rs);
             JDBCUtils.close(stmt);
-            JDBCUtils.close(connection);
+           // JDBCUtils.close(connection);
         }
     }
 
