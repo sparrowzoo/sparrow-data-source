@@ -17,8 +17,6 @@
 
 package com.sparrow.datasource;
 
-import com.sparrow.constant.SPARROW_ERROR;
-import com.sparrow.protocol.BusinessException;
 import com.sparrow.transaction.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

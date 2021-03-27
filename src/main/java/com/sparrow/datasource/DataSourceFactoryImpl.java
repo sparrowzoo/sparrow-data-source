@@ -17,7 +17,7 @@
 
 package com.sparrow.datasource;
 
-import com.sparrow.constant.CACHE_KEY;
+import com.sparrow.constant.CacheKey;
 import com.sparrow.core.cache.Cache;
 import com.sparrow.core.cache.StrongDurationCache;
 import com.sparrow.core.spi.ApplicationContext;
@@ -44,7 +44,7 @@ public class DataSourceFactoryImpl implements DataSourceFactory {
 
     private static Logger logger = LoggerFactory.getLogger(DataSourceFactoryImpl.class);
     private static Map<String, DatasourceConfig> datasourceConfigMap = new ConcurrentHashMap<String, DatasourceConfig>();
-    private static Cache<String,DatasourceKey> datasourceUrlPair=new StrongDurationCache<>(CACHE_KEY.DATA_SOURCE_URL_PAIR);
+    private static Cache<String,DatasourceKey> datasourceUrlPair=new StrongDurationCache<>(CacheKey.DATA_SOURCE_URL_PAIR);
 
     public DataSourceFactoryImpl(String initDatasourceKeys) {
         String[] datasourceKeyArray = initDatasourceKeys.split(",");
